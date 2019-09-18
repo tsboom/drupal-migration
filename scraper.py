@@ -10,7 +10,7 @@ import url_list
 
 # get list of URLs from Content Audit ex: ['Ref Id', 'URL']
 urls = url_list.get_content_audit_values()
-pdb.set_trace()
+
 # article_url = "http://usmai.umd.edu/documents/aleph-tables"
 
 
