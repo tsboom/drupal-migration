@@ -4,55 +4,72 @@ from selenium.webdriver.common.keys import Keys
 import requests
 import pickle
 import time
+import pdb
+import url_list
 
 
-article_url = "http://usmai.umd.edu/documents/aleph-tables"
-
-
-driver = webdriver.Firefox()
-driver.get(article_url)
-
-# log into the homepage
-username = driver.find_element_by_name('name')
-username.send_keys('tiffany')
-password = driver.find_element_by_name('pass')
-password.send_keys('tiffany1')
-password.send_keys(Keys.RETURN)
-
-# save cookie
-pickle.dump(driver.get_cookies() , open('cookies.pkl', 'wb'))
-
-#new driver
-driver = webdriver.Firefox()
+# get list of URLs from Content Audit ex: ['Ref Id', 'URL']
+urls = url_list.get_content_audit_values()
+pdb.set_trace()
+# article_url = "http://usmai.umd.edu/documents/aleph-tables"
 
 
 
-# go to article
+def clean_html(post_body):
+    '''
+    function that will remove inline styles and extra stuff from HTML
+    '''
+    print('to be continued...')
+    clean_post = 'cleaned up post_body'
+    return clean_post
 
 
-driver= driver.get(article_url)
-time.sleep(5)
-# load cookies
-cookies = pickle.load(open('cookies.pkl', 'rb'))
-for cookie in cookies:
-    driver.add_cookie(cookie)
+def scrape_article(url, ref_id):
+    # go to article
+    driver = webdriver.Firefox()
+    driver.get(url)
 
-driver.refresh_page()
-time.sleep(5)
+    # log into the homepage
+    username = driver.find_element_by_name('name')
+    username.send_keys('tiffany')
+    password = driver.find_element_by_name('pass')
+    password.send_keys('tiffany1')
+    password.send_keys(Keys.RETURN)
+
+    # wait and get content
+    time.sleep(3)
+    content = driver.find_element_by_id('content').get_attribute('innerHTML')
+
+    # create BS out of HTML
+    soup = BeautifulSoup(content, features="html.parser")
+
+    # get title out of BeautifulSoup
+    title = soup.h1.string
+
+    # get content out of id content-area < class content
+    post_body = soup.select('#content-area .content')[0].prettify()
+    '''
+    more processing should be done on this post_body to remove inline styles.
+    we just want the plain HTML tags.
+    '''
 
 
-content = driver.find_element_by_css_selector('.content').get_attribute('innerHTML')
 
-print(content)
-# soup = BeautifulSoup("<p>Some<b>bad<i>HTML")
-# print soup.prettify()
+    # save to html
+    file = 'page_html/' +  ref_id + '_' + title + '.html'
+    with open(file, 'w+') as f:
+        f.write(post_body)
+
+    driver.close()
+
 
 '''
-requests version
+scrape html from each url in urls
 '''
-s = requests.Session()
-data = {'name':'tiffany', 'pass':'tiffany1'}
-url = "http://usmai.umd.edu"
-
-r = s.post(url, data=data)
-html
+for urlrefid in urls:
+    # parse out ref_id and URL
+    ref_id = urlrefid [0]
+    url = urlrefid [1]
+    # only scrape for valid urls
+    if url.startswith('http'):
+        scrape_article(url, ref_id)
