@@ -6,6 +6,7 @@ import pickle
 import time
 import pdb
 import url_list
+import login_credentials
 
 
 # get list of URLs from Content Audit ex: ['Ref Id', 'URL']
@@ -31,9 +32,9 @@ def scrape_article(url, ref_id):
 
     # log into the homepage
     username = driver.find_element_by_name('name')
-    username.send_keys('tiffany')
+    username.send_keys(login_credentials.USERNAME)
     password = driver.find_element_by_name('pass')
-    password.send_keys('tiffany1')
+    password.send_keys(login_credentials.PASSWORD)
     password.send_keys(Keys.RETURN)
 
     # wait and get content
