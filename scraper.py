@@ -12,10 +12,6 @@ import login_credentials
 # get list of URLs from Content Audit ex: ['Ref Id', 'URL']
 urls = url_list.get_content_audit_values()
 
-# article_url = "http://usmai.umd.edu/documents/aleph-tables"
-
-
-
 def clean_html(post_body):
     '''
     function that will remove inline styles and extra stuff from HTML
