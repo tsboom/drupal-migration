@@ -10,7 +10,7 @@ import importer_utils
 space_mapping = {
     "Archive": "Archive",
     "CLD": "CLD",
-    "eBook": "EBOOK",
+    "EBOOK": "EBOOK",
     "IRSS": "IRSS",
     "Main": "MAIN",
     "META":"MS",
@@ -48,6 +48,9 @@ for file in os.listdir(page_directory):
         # take out attachments table
         page_html = importer_utils.remove_attachment_table(page_html)
         
+        # fix relative links so they link to usmai.umd.edu 
+        page_html = importer_utils.fix_relative_links(page_html)
+        
         # get filename without the html at the end
         page_title = os.path.splitext(file)[0]
 
@@ -63,7 +66,7 @@ for file in os.listdir(page_directory):
                     space = row[8]
                     
         #create page if space is not NA 
-        if space is not "NA": 
+        if space != "NA": 
             
             space = space_mapping[space]
             
