@@ -23,12 +23,12 @@ def clean_html(htmlIn):
     for tag in htmlIn.recursiveChildGenerator():
         attrKeys = {}        
         try:
-            for k in tag.attrs.keys():
+            for k in list(tag):
                 if k in blacklist:
                     del tag.attrs[k]
         except AttributeError:
             pass
-    return post_body_raw
+    return htmlIn
 
 def imgHarvest(htmlIn):
     '''
@@ -98,24 +98,16 @@ def scrape_article(url, ref_id):
     
     # get title out of BeautifulSoup
     title = soup.h1.string
-'''
-The commented code here can probably go away. I don't remember what this did but I think I changed approahces.
-'''
-#    for a in soup.findAll('a', href=True):
-#        print(a)
-#        pdb.set_trace()
-#        for attribute in blacklist:
-#            del tag[attribute]
 
     # get content out of id content-area < class content
     post_body_raw = soup.select('#content-area .content')[0]
     
-    clean_html(post_body_raw)
+    post_body_raw = clean_html(post_body_raw)
     imgHarvest(post_body_raw)
     attachmentHarvest(post_body_raw)
 
-    post_body = post_body_raw.prettify().encode(encoding="utf-8")
-    
+    post_body = str(post_body_raw)
+    pdb.set_trace()
         
     '''
     more processing should be done on this post_body to remove inline styles.
