@@ -14,13 +14,13 @@ post_body_raw = None
 urls = url_list.get_content_audit_values()
 
 
-def clean_html(htmlIn):
+def clean_html(html):
 
     '''
     function that will remove inline styles and extra stuff from HTML
     '''
     blacklist = ['style','border','width','height','cellpadding','cellspacing','align','valign','target']
-    for tag in htmlIn.recursiveChildGenerator():
+    for tag in html.recursiveChildGenerator():
         attrKeys = {}        
         try:
             for k in list(tag):
@@ -28,22 +28,22 @@ def clean_html(htmlIn):
                     del tag.attrs[k]
         except AttributeError:
             pass
-    return htmlIn
+    return html
 
-def imgHarvest(htmlIn):
+def img_harvest(html):
     '''
     Harvest img references as long as they are from the USMAI domain. Has some error handling to manage invalid schemes, missing schemes, or external connections.
     '''
-    for a in htmlIn.findAll('img'):
+    for a in html.findAll('img'):
         try:
-            urlTemp = (a.attrs['src'])
-            if 'http://usmai.umd.edu' not in urlTemp:
-                url = 'http://usmai.umd.edu' + urlTemp
+            url_temp = (a.attrs['src'])
+            if 'http://usmai.umd.edu' not in url_temp:
+                url = 'http://usmai.umd.edu' + url_temp
             else:
-                url = urlTemp
-            picFile = url.rsplit('/',1)[1]
+                url = url_temp
+            pic_file = url.rsplit('/',1)[1]
             r = requests.get(url, allow_redirects=True)
-            file = 'page_html/' +  ref_id + '_' + picFile
+            file = 'page_html/' +  ref_id + '_' + pic_file
             open(file, 'wb').write(r.content)
         except requests.exceptions.InvalidSchema:
             continue
@@ -53,29 +53,25 @@ def imgHarvest(htmlIn):
             continue
 
 
-def attachmentHarvest(htmlIn):
+def attachment_harvest(html):
     '''
     Harvest attached files as long as they are from the USMAI domain. Has connection error handling if connection rejected. Shoudl only pick up files from USMAI domain server.
     '''
-    for a in htmlIn.findAll('a',href=True):
+    for a in html.findAll('a',href=True):
         try:
-            urlTemp = (a.attrs['href'])
-            if 'http://usmai.umd.edu' not in urlTemp:
-                url = 'http://usmai.umd.edu' + urlTemp
+            url_temp = (a.attrs['href'])
+            if 'http://usmai.umd.edu' not in url_temp:
+                url = 'http://usmai.umd.edu' + url_temp
             else:
-                url = urlTemp
-            filePath = url.rsplit('/',1)[1]
+                url = url_temp
+            filepath = url.rsplit('/',1)[1]
             if 'sites/staff/files/' in url or 'sites/default/files' in url:
                 r = requests.get(url, allow_redirects=True)
-                file = 'page_html/' + ref_id + '_' + filePath
+                file = 'page_html/' + ref_id + '_' + filepath
                 open(file, 'wb').write(r.content)
                 print(url)
         except requests.exceptions.ConnectionError:
-            continue 
-#        if filePath.rsplit('.',1)[1] not in fileBlacklist:
-#            print(filePath)
-
-
+            continue     
 
 def scrape_article(url, ref_id):
     # go to article
@@ -103,12 +99,11 @@ def scrape_article(url, ref_id):
     post_body_raw = soup.select('#content-area .content')[0]
     
     post_body_raw = clean_html(post_body_raw)
-    imgHarvest(post_body_raw)
-    attachmentHarvest(post_body_raw)
+    img_harvest(post_body_raw)
+    attachment_harvest(post_body_raw)
 
     post_body = str(post_body_raw)
-    pdb.set_trace()
-        
+
     '''
     more processing should be done on this post_body to remove inline styles.
     we just want the plain HTML tags.
