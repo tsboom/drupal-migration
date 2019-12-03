@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import requests
+import datetime
 import pickle
 import time
 import pdb
@@ -55,7 +56,7 @@ def img_harvest(html):
 
 def attachment_harvest(html):
     '''
-    Harvest attached files as long as they are from the USMAI domain. Has connection error handling if connection rejected. Shoudl only pick up files from USMAI domain server.
+    Harvest attached files as long as they are from the USMAI domain. Has connection error handling if connection rejected. Should only pick up files from USMAI domain server.
     '''
     for a in html.findAll('a',href=True):
         try:
@@ -69,8 +70,12 @@ def attachment_harvest(html):
                 r = requests.get(url, allow_redirects=True)
                 file = 'page_html/' + ref_id + '_' + filepath
                 open(file, 'wb').write(r.content)
+                with open('log', 'a+') as f:
+                    f.write(filepath + ' saved\n')
                 print(url)
         except requests.exceptions.ConnectionError:
+            with open('log', 'a+') as f:
+                f.write(filepath + ' failed to save: connection error\n')
             continue     
 
 def scrape_article(url, ref_id):
@@ -93,7 +98,10 @@ def scrape_article(url, ref_id):
     soup = BeautifulSoup(content, features="html.parser")
     
     # get title out of BeautifulSoup
-    title = soup.h1.string
+    if soup.h1:
+        title = soup.h1.string
+    else: 
+        title = "no h1 found"
 
     # get content out of id content-area < class content
     post_body_raw = soup.select('#content-area .content')[0]
@@ -114,6 +122,7 @@ def scrape_article(url, ref_id):
         file = 'page_html/' +  ref_id + '_' + title + '.html'
         with open(file, 'w+') as f:
             f.write(post_body)
+            print(ref_id)
         f.close()
         driver.close()
     except IOError:
