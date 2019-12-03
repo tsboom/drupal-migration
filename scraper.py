@@ -65,10 +65,17 @@ def attachment_harvest(html):
                 url = 'http://usmai.umd.edu' + url_temp
             else:
                 url = url_temp
+                
             filepath = url.rsplit('/',1)[1]
             if 'sites/staff/files/' in url or 'sites/default/files' in url:
                 r = requests.get(url, allow_redirects=True)
-                file = 'page_html/' + ref_id + '_' + filepath
+                # put attachment into img or attachments directory depending on content type
+                if url.endswith(('.png', '.jpeg', '.jpg', '.gif')):
+                    final_dir = 'imgs'
+                else:
+                    final_dir = 'attachments'
+                    
+                file = final_dir + ref_id + '_' + filepath
                 open(file, 'wb').write(r.content)
                 with open('log', 'a+') as f:
                     f.write(filepath + ' saved\n')
