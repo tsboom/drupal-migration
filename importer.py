@@ -1,5 +1,6 @@
 from atlassian import Confluence
 from bs4 import BeautifulSoup
+import datetime
 import os
 import pdb
 import url_list
@@ -31,6 +32,10 @@ def login_confluence():
     return confluence
 confluence = login_confluence()
     
+# external link tracking filepath
+today = datetime.datetime.today().strftime('%Y%m%d')
+links_file = f"external_links_{today}.csv"
+
 # get spreadsheet values from content audit 
 row_values = url_list.get_content_audit_values()
 
@@ -38,26 +43,33 @@ row_values = url_list.get_content_audit_values()
 # page_directory = '../page_html'
 page_directory = os.path.abspath('page_html')
 
-for file in os.listdir(page_directory):
+for file in sorted(os.listdir(page_directory)):
     print(file)
     if file.endswith('.html'):
         # get html into a variable
         with open(page_directory+ '/' + file, 'r') as f:
             page_html = f.read()
         
+        # create soup
+        soup = soup = BeautifulSoup(page_html, features="html.parser")
         # take out attachments table
-        page_html = importer_utils.remove_attachment_table(page_html)
+        page_html = importer_utils.remove_attachment_table(soup)
         
         # fix relative links so they link to usmai.umd.edu 
-        page_html = importer_utils.fix_relative_links(page_html)
+        page_html = importer_utils.fix_relative_links(soup)
         
         # get filename without the html at the end
         page_title = os.path.splitext(file)[0]
-
-        # find related attachments
+        # find ref id
         ref_id = file.split('_')[0]
 
-    
+        # write columns of external links 
+        with open(links_file,'a+') as f:
+            importer_utils.write_links(ref_id, soup, f)
+
+        '''
+        targeted space import
+        '''
         # find the space for the row
         space = 'NA'
         for row in row_values: 
