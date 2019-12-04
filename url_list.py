@@ -9,13 +9,13 @@ import pdb
 # # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
-# The ID and range of a sample spreadsheet.
-SAMPLE_SPREADSHEET_ID = '15eXz2MMLhm-I1e_pcpfW6ct-BT6g9l3HgV-OYRS100I'
-# CONTENT_RANGE = 'Content Inventory!C2:E2761'
+# The ID and range of spreadsheet.
+SPREADSHEET_ID = '15eXz2MMLhm-I1e_pcpfW6ct-BT6g9l3HgV-OYRS100I'
+
 # new range
 CONTENT_RANGE = 'Content Inventory!C2:U2779'
 
-def get_content_audit_values():
+def authenticate_gsheet():
     """Shows basic usage of the Sheets API.
     Prints values from a sample spreadsheet.
     """
@@ -40,15 +40,18 @@ def get_content_audit_values():
             pickle.dump(creds, token)
 
     service = build('sheets', 'v4', credentials=creds)
+    return service
 
+
+def get_content_audit_values():
+    service = authenticate_gsheet()
     # Call the Sheets API
     sheet = service.spreadsheets()
-    result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
+    result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
                                 range=CONTENT_RANGE).execute()
     values = result.get('values', [])
     return values
     
-
     
     
 if __name__ == '__main__':

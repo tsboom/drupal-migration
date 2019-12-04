@@ -44,7 +44,7 @@ def img_harvest(html):
                 url = url_temp
             pic_file = url.rsplit('/',1)[1]
             r = requests.get(url, allow_redirects=True)
-            file = 'page_html/' +  ref_id + '_' + pic_file
+            file = 'imgs/' +  ref_id + '_' + pic_file
             open(file, 'wb').write(r.content)
         except requests.exceptions.InvalidSchema:
             continue
@@ -65,17 +65,10 @@ def attachment_harvest(html):
                 url = 'http://usmai.umd.edu' + url_temp
             else:
                 url = url_temp
-                
             filepath = url.rsplit('/',1)[1]
             if 'sites/staff/files/' in url or 'sites/default/files' in url:
                 r = requests.get(url, allow_redirects=True)
-                # put attachment into img or attachments directory depending on content type
-                if url.endswith(('.png', '.jpeg', '.jpg', '.gif')):
-                    final_dir = 'imgs'
-                else:
-                    final_dir = 'attachments'
-                    
-                file = final_dir + ref_id + '_' + filepath
+                file = 'attachments/' + ref_id + '_' + filepath
                 open(file, 'wb').write(r.content)
                 with open('log', 'a+') as f:
                     f.write(filepath + ' saved\n')
@@ -147,6 +140,8 @@ scrape html from each url in urls
 Wrapper to run scrape function and write log
 '''
 f = open('log','a+')
+today = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+f.write('\n\n\n\n---- started scraper.py ' + today + '\n\n')
 for urlrefid in urls:
     # parse out ref_id and URL
     ref_id = urlrefid [0]
