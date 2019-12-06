@@ -12,8 +12,13 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 # The ID and range of spreadsheet.
 SPREADSHEET_ID = '15eXz2MMLhm-I1e_pcpfW6ct-BT6g9l3HgV-OYRS100I'
 
-# new range
+# real range
 CONTENT_RANGE = 'Content Inventory!C2:U2779'
+
+# big chunk of archive pages test
+#CONTENT_RANGE = 'Content Inventory!C1245:U2560'
+# CONTENT_RANGE = 'Content Inventory!C2322:U2560'
+
 
 def authenticate_gsheet():
     """Shows basic usage of the Sheets API.
