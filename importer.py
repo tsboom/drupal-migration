@@ -39,9 +39,9 @@ def login_confluence():
     # log in credentials for confluence api
     confluence = Confluence(
         # url='https://usmai-wwwdev.lib.umd.edu/portal',
-        url='https://usmai-www.lib.umd.edu/portal',
+        url='https://usmai-wwwdev.lib.umd.edu/portal',
         username='admin',
-        password='COOKIN1586')
+        password='FAKEPASSWORD')
     return confluence
 confluence = login_confluence()
     
